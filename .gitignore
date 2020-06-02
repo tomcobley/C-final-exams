@@ -1,0 +1,36 @@
+#This the the canonical lab .gitignore file (Imperial College) (edited)
+
+#ignore temp files
+*~
+
+#ignore junk files from latex output
+*.out
+*.log
+*.aux
+*.dvi
+*.ps
+
+#ignore junk files from compiling C code
+*.o
+
+#ignore junk files from compiling Haskell code
+*.hi
+
+#ignore junk files from compiling Java code
+*.class
+
+#ignore other junk files
+*.backup
+*.kate-swp
+*.swp
+*.snm
+*.vrb
+*.nav
+*.toc
+
+*.iml
+*.xml
+
+
+#ignore IDEA config directories
+.idea
