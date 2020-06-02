@@ -120,6 +120,11 @@ void huffman_tree_list_free(huffman_tree_list_t *l) {
  * Returns 1 if the string s contains the character c and 0 if it does not.
  */
 int contains(char *s, char c) {
+  for (; *s; s++) {
+    if (*s == c) {
+      return 1;
+    }
+  }
   return 0;
 }
 
@@ -127,7 +132,13 @@ int contains(char *s, char c) {
  * Returns the number of occurrences of c in s.
  */
 int frequency(char *s, char c) {
-  return 0;
+  int count;
+  for (count = 0; *s; s++) {
+    if (*s == c) {
+      count++;
+    }
+  }
+  return count;
 }
 
 /*
@@ -138,7 +149,18 @@ int frequency(char *s, char c) {
  *      characters.
  */
 char *nub(char *s) {
-  return NULL;
+  int len = strlen(s);
+  char chars[len];
+  int charindex = 0;
+  for (int i = 0; i < len; i++) {
+    if (!contains(chars, s[i])) {
+      chars[charindex] = s[i];
+      charindex++;
+    }
+  }
+  char *chars_heap = malloc(charindex + 2);
+  strcpy(chars_heap, chars);
+  return chars_heap;
 }
 
 /*
@@ -152,8 +174,27 @@ char *nub(char *s) {
  */
 huffman_tree_list_t *huffman_tree_list_add(huffman_tree_list_t *l,
                                             huffman_tree_t *t) {
+  
+  huffman_tree_list_t *node = malloc(sizeof(huffman_tree_list_t));
+  node->tree = t;
 
-  return NULL;
+  if (l == NULL || t->count <= l->tree->count) {
+    // insert at start of list
+    node->next = l;
+    return node;
+  }
+
+  huffman_tree_list_t *head = l;
+  for (; l->next; l = l->next) {
+    if (t->count <= l->next->tree->count) {
+      break;
+    }
+  }
+
+  // insert node after l
+  node->next = l->next;
+  l->next = node;
+  return head;
 }
 
 /*
@@ -167,8 +208,32 @@ huffman_tree_list_t *huffman_tree_list_add(huffman_tree_list_t *l,
  *        trees it contains.
  */
 huffman_tree_list_t *huffman_tree_list_build(char *s, char *t) {
-  return NULL;
+  
+  huffman_tree_list_t *l = NULL;
+  for (int i = 0; t[i]; i++) {
+    huffman_tree_t *tree = calloc(1, sizeof(huffman_tree_t));
+    tree->count = frequency(s, t[i]);
+    tree->letter = t[i];
+    // Note: left and right subtrees of h are NULL (by use of calloc)
+    l = huffman_tree_list_add(l, tree);
+  }
+
+  return l;
 }
+
+
+/* 
+ * Removes the first two elements from a list of Huffman trees
+ *
+ * Pre: l has at least two elements
+ */
+static huffman_tree_list_t *huffman_tree_list_remove_two(huffman_tree_list_t *l) {
+  huffman_tree_list_t *new_head = l->next->next;
+  free(l->next);
+  free(l);
+  return new_head;
+}
+
 
 /*
  * Reduces a sorted list of Huffman trees to a single element.
@@ -179,8 +244,26 @@ huffman_tree_list_t *huffman_tree_list_build(char *s, char *t) {
  * Post:  The resuling list contains a single, correctly-formed Huffman tree.
  */
 huffman_tree_list_t *huffman_tree_list_reduce(huffman_tree_list_t *l) {
-  return NULL;
+  
+  while (l->next) {
+    // l->next is not NULL, so the list has at least 2 elements
+    huffman_tree_t *node = malloc(sizeof(huffman_tree_t));
+    huffman_tree_t *left = l->tree;
+    huffman_tree_t *right = l->next->tree;
+
+    node->count = left->count + right->count;
+    node->letter = '\0';
+    node->left = left;
+    node->right = right;
+
+    l = huffman_tree_list_remove_two(l);
+    l = huffman_tree_list_add(l, node);
+  }
+
+  // l now has exactly one element, the final huffman tree
+  return l;
 }
+
 
 /*
  * Accepts a Huffman tree t and a string s and returns a new heap-allocated

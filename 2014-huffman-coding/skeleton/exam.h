@@ -17,6 +17,12 @@ typedef struct huffman_tree_list {
   struct huffman_tree_list *next;
 } huffman_tree_list_t;
 
+/* typedef struct code_lookup_table { */
+/*   char letter; */
+/*   char *code; */
+/*   code_lookup_table *next; */
+/* } code_lookup_table_t; */
+
 void print_huffman_tree(const huffman_tree_t *);
 void print_huffman_tree_codes(const huffman_tree_t *);
 void print_huffman_tree_list(const huffman_tree_list_t *);
