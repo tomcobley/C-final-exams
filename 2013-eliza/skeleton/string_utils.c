@@ -7,17 +7,19 @@
 #include <stdio.h>
 #include <ctype.h>
 
+
+
 /* Returns a heap allocated, null-terminated, zero-length string. */
 
 char *empty_string(void)
 {
-
- /* YOU SHOULD DELETE THE CONTENTS OF THIS FUNCTION AND REPLACE IT WITH
-  * YOUR ANSWER TO PART I, QUESTION 1.
-  */
-
-  fprintf(stderr, "empty_string() unimplemented.\n");
-  exit(EXIT_FAILURE);
+  char *str = malloc(1);
+  if (!str) {
+    perror("empty_string: memory allocation failed");
+    exit(EXIT_FAILURE);
+  }
+  str[0] = '\0';
+  return str;
 }
 
 
@@ -25,13 +27,13 @@ char *empty_string(void)
 
 char *clone(const char *str)
 {
-
- /* YOU SHOULD DELETE THE CONTENTS OF THIS FUNCTION AND REPLACE IT WITH
-  * YOUR ANSWER TO PART I, QUESTION 2.
-  */
-
-  fprintf(stderr, "clone() unimplemented.\n");
-  exit(EXIT_FAILURE);
+  char *copy = malloc(strlen(str));
+   if (!copy) {
+    perror("clone: memory allocation failed");
+    exit(EXIT_FAILURE);
+  }
+  strcpy(copy, str);
+  return copy;
 }
 
 
@@ -42,13 +44,14 @@ char *clone(const char *str)
 
 char *push_string(char *current, const char *append)
 {
-
- /* YOU SHOULD DELETE THE CONTENTS OF THIS FUNCTION AND REPLACE IT WITH
-  * YOUR ANSWER TO PART I, QUESTION 3.
-  */
-
-  fprintf(stderr, "push_string() unimplemented.\n");
-  exit(EXIT_FAILURE);
+  int len_current = strlen(current), len_append = strlen(append);
+  current = realloc(current, len_current + len_append);
+  if (!current) {
+    perror("current: memory allocation failed");
+    exit(EXIT_FAILURE);
+  }
+  strcpy(current + len_current, append);
+  return current;
 }
 
 

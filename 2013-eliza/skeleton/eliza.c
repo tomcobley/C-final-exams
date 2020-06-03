@@ -184,6 +184,27 @@ static void interactive_loop(struct eliza_state *eliza)
 
 int main(void)
 {
+
+  /* printf("%lu \n", strlen("\0")); */
+  /* printf("%lu \n", strlen("abc\0")); */
+  /* char *str = empty_string(); */
+  /* str = push_string(str, "This " ); */
+  /* str = push_string(str, "is " ); */
+  /* str = push_string(str, "a sequence of " ); */
+  /* str = push_string(str, "string concatenations!" ); */
+  /* printf(" %s \n " , str); */
+  /* free(str); */
+
+  struct map *m = malloc(sizeof(struct map));
+  map_init(m); 
+  int *n = malloc(sizeof(int));
+  *n = 6;
+  map_insert(m, "key", n);
+  int *n2 = malloc(sizeof(int));
+  *n2 = 7;
+  
+  map_insert(m, "key2", n2);
+
   struct eliza_state eliza;
   eliza_init(&eliza);
   const int result = parse_eliza_script(&eliza, "./script");
