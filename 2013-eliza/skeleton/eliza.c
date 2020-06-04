@@ -195,15 +195,15 @@ int main(void)
   /* printf(" %s \n " , str); */
   /* free(str); */
 
-  struct map *m = malloc(sizeof(struct map));
-  map_init(m); 
-  int *n = malloc(sizeof(int));
-  *n = 6;
-  map_insert(m, "key", n);
-  int *n2 = malloc(sizeof(int));
-  *n2 = 7;
+  /* struct map *m = malloc(sizeof(struct map)); */
+  /* map_init(m); */ 
+  /* int *n = malloc(sizeof(int)); */
+  /* *n = 6; */
+  /* map_insert(m, "key", n); */
+  /* int *n2 = malloc(sizeof(int)); */
+  /* *n2 = 7; */
   
-  map_insert(m, "key2", n2);
+  /* map_insert(m, "key2", n2); */
 
   struct eliza_state eliza;
   eliza_init(&eliza);
@@ -215,5 +215,6 @@ int main(void)
   interactive_loop(&eliza);
   eliza_destroy(&eliza);
 
+  /* free(eliza); */
   return EXIT_SUCCESS;
 }

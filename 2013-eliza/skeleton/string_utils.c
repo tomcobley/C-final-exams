@@ -27,12 +27,13 @@ char *empty_string(void)
 
 char *clone(const char *str)
 {
-  char *copy = malloc(strlen(str));
+  char *copy = malloc(strlen(str) + 1);
    if (!copy) {
     perror("clone: memory allocation failed");
     exit(EXIT_FAILURE);
   }
   strcpy(copy, str);
+  copy[strlen(str)] = '\0';
   return copy;
 }
 
@@ -45,7 +46,7 @@ char *clone(const char *str)
 char *push_string(char *current, const char *append)
 {
   int len_current = strlen(current), len_append = strlen(append);
-  current = realloc(current, len_current + len_append);
+  current = realloc(current, len_current + len_append + 1);
   if (!current) {
     perror("current: memory allocation failed");
     exit(EXIT_FAILURE);

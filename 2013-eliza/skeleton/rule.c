@@ -266,4 +266,5 @@ void destroy_rule(struct rule *rule)
 {
   free(rule->key);
   free(rule->reasmb);
+  free(rule->decomp);
 }

@@ -53,13 +53,22 @@ struct map_node *map_insert_internal(struct map_node *node, const char *key, voi
 }
 
 
+
+static void map_apply_elems_internal(struct map_node *node, void (*function)(void *)) {
+  if (!node) {return;}
+
+  map_apply_elems_internal(node->left, function);
+  map_apply_elems_internal(node->right, function);
+
+  (*function)(node->value);
+}
+
+
 /* Applies the given function pointer to every *value* in the map */
 
 void map_apply_elems(struct map *m, void (*function)(void *))
 {
- /* YOU SHOULD DELETE THE CONTENTS OF THIS FUNCTION AND REPLACE IT WITH
-  * YOUR ANSWER TO PART 3, QUESTION 1.
-  */
+  map_apply_elems_internal(m->root, function);
 }
 
 
