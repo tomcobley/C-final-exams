@@ -5,9 +5,11 @@
 #include <string.h>
 
 /* ------------------ YOUR CODE HERE ------------------- */
+#define ALPHABET_SIZE (26)
 
-// PRE: curr_word is a valid word (exists in the dictionary dict)
-bool valid_step(dictionary_t *dict, const char *curr_word, const char *next_word) {
+
+bool
+valid_step(dictionary_t *dict, const char *curr_word, const char *next_word) {
   size_t len = strlen(curr_word);
   if (len != strlen(next_word)) { return false; }
 
@@ -17,7 +19,7 @@ bool valid_step(dictionary_t *dict, const char *curr_word, const char *next_word
       changes++;
     }
   }
-  return changes == 1 && find(dict, next_word);
+  return changes == 1 && find(dict, curr_word) && find(dict, next_word);
 }
 
 static void print_upper(const char *str) {
@@ -33,7 +35,7 @@ static void print_lower(const char *str) {
 void print_chain(const char **chain) {
   print_upper(chain[0]);
   int i;
-  for (i = 1; chain[i+1]; i++) {
+  for (i = 1; chain[i + 1]; i++) {
     print_lower(chain[i]);
   }
   print_upper(chain[i]);
@@ -44,30 +46,63 @@ bool valid_chain(dictionary_t *dict, const char **chain) {
   insert(used_words, chain[0]);
 
   for (int i = 1; chain[i]; i++) {
-    if (!valid_step(dict, chain[i-1], chain[i]) || find(used_words, chain[i])) {
+    if (!valid_step(dict, chain[i - 1], chain[i]) ||
+        find(used_words, chain[i])) {
+      free_dict(used_words);
       return false;
     }
   }
+  free_dict(used_words);
   return true;
 }
 
-//bool find_chain_internal(dictionary_t *dict, const char *word,
-//                         const char *target_word, const char **chain, int max_words, int chain_length, int word_length) {
-//
-//
-//  for (int i = 0; i < word_length; i++) {
-//    // vary one character in word at a time
-//  }
-//
-//}
 
-bool find_chain(dictionary_t *dict, const char *start_word, 
+bool in_chain(const char **chain, char *str) {
+  for (int i = 0; chain[i]; i++) {
+    if (!strcmp(chain[i], str)) { return true; }
+  }
+  return false;
+}
+
+bool find_chain_dfs(dictionary_t *dict, const char *curr_word,
+                    const char *target_word, const char **chain, int max_words,
+                    int step, size_t word_length) {
+
+  if (step == max_words) { return false; }
+
+  chain[step] = curr_word;
+  if (!strcmp(curr_word, target_word)) { return true; }
+
+  for (int i = 0; i < word_length; i++) {
+    // vary one character in word at a time
+    char *new_word = malloc(MAX_WORD_SIZE + 1);
+    strcpy(new_word, curr_word);
+
+    for (int j = 0; j < ALPHABET_SIZE; j++) {
+      new_word[i] = (char) (((int) 'A') + j);
+      if (find(dict, new_word) && !in_chain(chain, new_word)) {
+        // new word is a valid word which hasn't been used before
+        if (find_chain_dfs(dict, new_word, target_word, chain, max_words,
+                           step + 1, word_length)) {
+          return true;
+        }
+      }
+    }
+    free(new_word);
+  }
+
+  chain[step] = NULL;
+  return false;
+}
+
+bool find_chain(dictionary_t *dict, const char *start_word,
                 const char *target_word, const char **chain, int max_words) {
 
-  return false;
   // Attempt at brute-force recursive search strategy
-  //size_t length = strlen(word);
-
+  char *new_word = malloc(MAX_WORD_SIZE + 1);
+  strcpy(new_word, start_word);
+  return (find_chain_dfs(dict, new_word, target_word,
+                     chain, max_words, 0, strlen(start_word)));
 }
 
 #ifdef DOUBLETS_MAIN
@@ -83,19 +118,12 @@ int main(void) {
 
   const char **chain = calloc(MAX_WORDS + 1, sizeof(char *));
 
-//  const char **chain2 = calloc(MAX_WORDS + 1, sizeof(char *));
-//  chain2[0] = "word";
-//  chain2[1] = "WORS";
-//  chain2[2] = "wars";
-//  chain2[3] = "WART";
-//  print_chain(chain2);
-
   bool success = find_chain(dict, "HARD", "EASY", chain, MAX_WORDS);
   printf("%s a Chain of %d words!\n",
          success ? "Found" : "Couldn't find", MAX_WORDS);
   if (success) {
     print_chain(chain);
-    for(int i = 0; i < MAX_WORDS; i++)
+    for (int i = 0; i < MAX_WORDS; i++)
       free((void *) chain[i]);
   }
 

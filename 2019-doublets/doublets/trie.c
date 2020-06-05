@@ -79,15 +79,6 @@ void free_node(dictionary_t *root) {
   free(root);
 }
 
-static void load_word(FILE *fp, char *word) {
-  fscanf(fp, "%s", word);
-  size_t length = strlen(word);
-  if (word[length - 1] == '\n') {
-    // replace trailing \n with sentinel char
-    word[length - 1] = '\0';
-  }
-
-}
 
 bool load_from_file(dictionary_t *root, const char *filename) {
   FILE *fp = fopen(filename, "r");
