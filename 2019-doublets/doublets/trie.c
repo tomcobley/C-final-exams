@@ -1,8 +1,11 @@
 #include "trie.h"
 
+#include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
+
 
 dictionary_t *create_dict(void) {
   return create_node();
@@ -14,23 +17,92 @@ void free_dict(dictionary_t *root) {
 
 /* ------------ YOUR CODE BELOW -------------- */
 
+#define ALPHABET_SIZE (26)
+
+static int char_to_int(char c) {
+  assert('A' <= c && c <= 'Z');
+  return c - 'A';
+}
+
 bool find(dictionary_t *root, const char *word) {
-  return false;
+  if (!root) { return false;}
+  char c = word[0];
+  if (!c) {
+    // sentinel character reached (end of string), return end_of_word
+    return root->end_of_word;
+  }
+  if (!isalpha(c)) {
+    return false;
+  }
+  return find(root->children[char_to_int(c)], word + 1);
 }
 
 bool insert(dictionary_t *root, const char *word) {
-  return false;
+  char c = word[0];
+  if (!c) {
+    // sentinel character reached (end of string), mark end of word, return true
+    return root->end_of_word = true;
+  }
+  if (!isalpha(c)) {
+    return false;
+  }
+  int char_index = char_to_int(c);
+  if (!root->children[char_index]) {
+    // no node exists for c, so create one
+    root->children[char_index] = create_node();
+  }
+  return insert(root->children[char_index], word + 1);
 }
 
 dictionary_t *create_node(void) {
-  return NULL;
+  dictionary_t *node = malloc(sizeof(dictionary_t));
+  if (!node) {
+    perror("create_node: memory allocation failed");
+    exit(EXIT_FAILURE);
+  }
+  node->children = calloc(ALPHABET_SIZE, sizeof(dictionary_t *));
+  if (!node->children) {
+    perror("create_node: children memory allocation failed");
+    exit(EXIT_FAILURE);
+  }
+  node->end_of_word = false;
+  return node;
 }
 
 void free_node(dictionary_t *root) {
+  if (!root) {return;}
+
+  for (int i = 0; i < ALPHABET_SIZE; i++) {
+    free_node(root->children[i]);
+  }
+  free(root->children);
+  free(root);
+}
+
+static void load_word(FILE *fp, char *word) {
+  fscanf(fp, "%s", word);
+  size_t length = strlen(word);
+  if (word[length - 1] == '\n') {
+    // replace trailing \n with sentinel char
+    word[length - 1] = '\0';
+  }
+
 }
 
 bool load_from_file(dictionary_t *root, const char *filename) {
-  return false;
+  FILE *fp = fopen(filename, "r");
+  if (!fp) {return false;}
+
+  char *word = malloc(MAX_WORD_SIZE + 1);
+  fscanf(fp, "%s", word);
+  while (!feof(fp)) {
+    insert(root, word);
+    fscanf(fp, "%s", word);
+  }
+
+  free(word);
+  fclose(fp);
+  return true;
 }
 
 #ifdef DICTIONARY_MAIN
