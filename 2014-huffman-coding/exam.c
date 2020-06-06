@@ -4,12 +4,14 @@
 #include <string.h>
 
 #include "exam.h"
+#include "map.h"
 
 /*
  * Private function prototypes.
  */
 
 static void _print_huffman_tree(const huffman_tree_t *, int);
+
 static void _print_huffman_tree_codes(const huffman_tree_t *, char *, char *);
 
 /*
@@ -173,8 +175,8 @@ char *nub(char *s) {
  *        it contains.
  */
 huffman_tree_list_t *huffman_tree_list_add(huffman_tree_list_t *l,
-                                            huffman_tree_t *t) {
-  
+                                           huffman_tree_t *t) {
+
   huffman_tree_list_t *node = malloc(sizeof(huffman_tree_list_t));
   node->tree = t;
 
@@ -208,7 +210,7 @@ huffman_tree_list_t *huffman_tree_list_add(huffman_tree_list_t *l,
  *        trees it contains.
  */
 huffman_tree_list_t *huffman_tree_list_build(char *s, char *t) {
-  
+
   huffman_tree_list_t *l = NULL;
   for (int i = 0; t[i]; i++) {
     huffman_tree_t *tree = calloc(1, sizeof(huffman_tree_t));
@@ -227,7 +229,8 @@ huffman_tree_list_t *huffman_tree_list_build(char *s, char *t) {
  *
  * Pre: l has at least two elements
  */
-static huffman_tree_list_t *huffman_tree_list_remove_two(huffman_tree_list_t *l) {
+static huffman_tree_list_t *
+huffman_tree_list_remove_two(huffman_tree_list_t *l) {
   huffman_tree_list_t *new_head = l->next->next;
   free(l->next);
   free(l);
@@ -244,7 +247,7 @@ static huffman_tree_list_t *huffman_tree_list_remove_two(huffman_tree_list_t *l)
  * Post:  The resuling list contains a single, correctly-formed Huffman tree.
  */
 huffman_tree_list_t *huffman_tree_list_reduce(huffman_tree_list_t *l) {
-  
+
   while (l->next) {
     // l->next is not NULL, so the list has at least 2 elements
     huffman_tree_t *node = malloc(sizeof(huffman_tree_t));
@@ -265,6 +268,31 @@ huffman_tree_list_t *huffman_tree_list_reduce(huffman_tree_list_t *l) {
 }
 
 
+void populate_code_map(huffman_tree_t *t, map_t *map,
+                       char code[MAX_CODE_LENGTH + 1]) {
+
+  if (t->letter) {
+    char *code_ = malloc(strlen(code) + 1);
+    strcpy(code_, code);
+    insert(map, t->letter, code_);
+    return;
+  }
+
+  // use stack allocated strings to simplify freeing
+  char lcode[MAX_CODE_LENGTH + 1], rcode[MAX_CODE_LENGTH + 1];
+  strcpy(lcode, code);
+  strcpy(rcode, code);
+  size_t i = strlen(code);
+  lcode[i] = 'L';
+  lcode[i + 1] = '\0';
+  rcode[i] = 'R';
+  rcode[i + 1] = '\0';
+
+  populate_code_map(t->left, map, lcode);
+  populate_code_map(t->right, map, rcode);
+
+}
+
 /*
  * Accepts a Huffman tree t and a string s and returns a new heap-allocated
  * string containing the encoding of s as per the tree t.
@@ -272,7 +300,15 @@ huffman_tree_list_t *huffman_tree_list_reduce(huffman_tree_list_t *l) {
  * Pre: s only contains characters present in the tree t.
  */
 char *huffman_tree_encode(huffman_tree_t *t, char *s) {
-  return NULL;
+
+  map_t *code_map = alloc_map();
+  populate_code_map(t, code_map, "");
+  char *code = malloc(MAX_CODE_LENGTH + 1);
+  for (int i = 0; s[i]; i++) {
+    strcat(code, find(code_map, s[i]));
+  }
+  free_map(code_map);
+  return code;
 }
 
 /*
@@ -282,5 +318,27 @@ char *huffman_tree_encode(huffman_tree_t *t, char *s) {
  * Pre: the code given is decodable using the supplied tree t.
  */
 char *huffman_tree_decode(huffman_tree_t *t, char *code) {
-  return NULL;
+  char *str = malloc(MAX_CODE_LENGTH);
+  int i = 0;
+  huffman_tree_t *node = t;
+  char c;
+
+  while ((c = *code)) {
+    assert(c == 'L' || c == 'R');
+    node = (c == 'L') ? node->left : node->right;
+    if (node->letter) {
+      // leaf of tree reached
+      str[i++] = node->letter;
+      // reset node pointer to root of tree
+      node = t;
+    }
+    code++;
+  }
+
+  // terminate string
+  str[i] = '\0';
+  return str;
 }
+
+
+

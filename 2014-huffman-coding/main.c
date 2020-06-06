@@ -4,22 +4,10 @@
 #include <string.h>
 
 #include "exam.h"
+#include "map.h"
 
 int main(int argc, char **argv) {
   char s[MAX_STRING_LENGTH];
-  
-  /* Incremental tests: */
-  printf("0 = %u\n", contains("ababababa", 'c'));
-  printf("1 = %u\n", contains("c", 'c'));
-  printf("1 = %u\n", contains("ababacbaba", 'c'));
-  assert(frequency("aaaaaaaaa", 'a') == 9);
-  assert(frequency("ababa", 'a') == 3);
-  assert(frequency("ababa", 'c') == 0);
-  
-  /* char *str = nub("abbccdd"); */
-  /* assert(!strcmp(str, "abcd")); */
-  /* printf("%s\n", str); */
-
 
   printf("Please enter a string for processing: ");
   scanf("%s", s);

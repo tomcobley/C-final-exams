@@ -7,11 +7,13 @@ CFLAGS  = -Wall -pedantic -g -std=c99
 
 all: main
 
-exam.o: exam.c exam.h
+map.o: map.c map.h
 
-main.o: exam.h main.c
+exam.o: exam.c exam.h map.h
 
-main: main.o exam.o
+main.o: exam.h main.c map.h
+
+main: main.o exam.o map.o
 	$(CC) $(CFLAGS) -o $@ $^
 
 clean:
