@@ -134,11 +134,12 @@ void string_iteration(image_t *dst, const char *str, int iterations) {
 
   while ((c = *(str++))) {
     switch (c) {
-      case '+': // *** opposite to spec, supposedly the spec is wrong
+      // NOTE: first two cases switched, the spec appears to be wrong
+      case '+':
         // rotate 90 deg clockwise ( = 270 deg anti-clockwise )
         for (int i = 0; i++ < 6; rotate(&direction));
         break;
-      case '-': // *** opposite to spec, supposedly the spec is wr-ong
+      case '-':
         // rotate 90 deg anti-clockwise
         for (int i = 0; i++ < 2; rotate(&direction));
         break;
