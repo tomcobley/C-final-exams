@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-void CopyUniqueLettersPtr(char *, const char *, int );
+// FIX
+char *CopyUniqueLettersPtr(char *, const char *, int );
+
 int *printIntPtr(int *, long );
 int contains(const char *, char );
 
@@ -10,15 +12,21 @@ int main(void)
 {
   char buffer[] = "good luck";
   char *cpybuffer = NULL;
-  int *intbuffer = NULL;
+
+  // FIX: must assign some memory to intbuffer in order for it to be written to
+  //int *intbuffer = NULL;
+  int *intbuffer = malloc(sizeof(buffer) * sizeof(int));
 
   printf("The contents of buffer is: %s\n", buffer);
 
-  CopyUniqueLettersPtr(cpybuffer, buffer, sizeof(buffer));
+  cpybuffer = CopyUniqueLettersPtr(cpybuffer, buffer, sizeof(buffer));
 
   intbuffer = (int *) printIntPtr(intbuffer, sizeof(buffer));
 
   printf("The unique letters are %s and the integer in array position 5 is: %i\n", cpybuffer, intbuffer[5]);
+
+  // FIX: must free cpybuffer and intbuffer
+  free(cpybuffer); free(intbuffer);
 
   return EXIT_SUCCESS;
 }
@@ -40,7 +48,8 @@ int contains(const char *s, const char c)
 
 //Copy unique number of characters from a string
 
-void CopyUniqueLettersPtr(char *dst, const char *src, int number_letters)
+// FIX: must return new pointer to dst
+char *CopyUniqueLettersPtr(char *dst, const char *src, int number_letters)
 {
   char *temp = calloc(strlen(src) + 1, sizeof(char));
   if (temp == NULL)
@@ -59,8 +68,10 @@ void CopyUniqueLettersPtr(char *dst, const char *src, int number_letters)
     }
   }
 
-  dst = realloc(temp, dst - temp + 1);
-  free(temp);
+  return dst = realloc(temp, dst - temp + 1);
+
+  // FIX: no need to free temp after realloc
+  //free(temp);
 }
 
 //initialise integer array and prints each item
